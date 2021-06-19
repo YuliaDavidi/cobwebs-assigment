@@ -44,7 +44,7 @@ namespace FBgame
                 int type = 0;
                 while (!(type >= 1 && type <= 5))
                 {
-                    Console.WriteLine($"Please enter Player{i + 1} type 1=Thorough, 2=ThoroughCheater, 3=Random, 4=Memory, 5=Cheater (1-5): ");
+                    Console.WriteLine($"Please enter Player{i + 1} type 1=Random, 2=Memory, 3=Thorough, 4=Cheater, 5=ThoroughCheater (1-5): ");
                     var input = Console.ReadLine();
                     if (!int.TryParse(input, out type))
                     {
@@ -58,31 +58,33 @@ namespace FBgame
                         }
                         else
                         {
+                            Console.WriteLine($"Please enter the player's name");
+                            var name = Console.ReadLine();
                             switch (type)
                             {
                                 case 1:
                                     {
-                                        players.Add(new Player($"Player{i + 1}(Thorough)", new Thorough()));
+                                        players.Add(new Player($"{name}(Random)", new RandomST()));
                                         break;
                                     }
                                 case 2:
                                     {
-                                        players.Add(new Player($"Player{i + 1}(ThoroughCheater)", new ThoroughCheater()));
+                                        players.Add(new Player($"{name}(Memory)", new Memory()));
                                         break;
                                     }
                                 case 3:
                                     {
-                                        players.Add(new Player($"Player{i + 1}(Random)", new RandomST()));
+                                        players.Add(new Player($"{name}(Thorough)", new Thorough()));
                                         break;
                                     }
                                 case 4:
                                     {
-                                        players.Add(new Player($"Player{i + 1}(Memory)", new Memory()));
+                                        players.Add(new Player($"{name}(Cheater)", new Cheater()));
                                         break;
                                     }
                                 case 5:
                                     {
-                                        players.Add(new Player($"Player{i + 1}(Cheater)", new Cheater()));
+                                        players.Add(new Player($"{name}(ThoroughCheater)", new ThoroughCheater()));
                                         break;
                                     }
                             }
@@ -95,11 +97,12 @@ namespace FBgame
         }
 
         private static void StartGame(List<Player> players)
-        {
-            Random random = new Random();
-            int basketWeight = random.Next(40, 140);
+        {          
             const int TOTAL_ALLOWED_MOVES = 100;
-            const int TIMEOUT = 15000;
+            const int TIMEOUT = 1500; //For bonus
+
+            Random random = new Random();
+            int basketWeight = random.Next(GameTracker.MinRange, GameTracker.MaxRange);
             bool hasWinner = false;
             int nextPlayerIndex = 0;
             int totalMoves = 0;
@@ -107,7 +110,7 @@ namespace FBgame
             Stopwatch stopWatch = new Stopwatch();
             Console.WriteLine($"Lets see who will guess first that number ({basketWeight})");           
             stopWatch.Start();
-            while (!hasWinner 
+            while (!hasWinner //this loop will synchronously and circulary let each player that is not waiting make his guess
                    && totalMoves < TOTAL_ALLOWED_MOVES 
                    && stopWatch.ElapsedMilliseconds < TIMEOUT)
             {
